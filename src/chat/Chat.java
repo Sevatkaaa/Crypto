@@ -9,5 +9,6 @@ public class Chat {
         chatSystem.sendDirectMessage(user1, user2, "Hello");
         chatSystem.sendDirectMessageWithSignature(user1, user2, "Hello");
         chatSystem.sendMessageToEveryone(user3, "Hi Sov");
+        chatSystem.sendMessageToEveryoneWithSignature(user3, "Hi Sov");
     }
 }

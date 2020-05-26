@@ -49,4 +49,9 @@ public class ChatSystem {
     public List<User> getUsers() {
         return users;
     }
+
+    public void sendMessageToEveryoneWithSignature(User fromUser, String message) {
+        System.out.println("\nUser " + fromUser.getName() + " sends message \"" + message + "\" WITH SIGNATURE to everyone\n");
+        users.forEach(user -> sendMessageWithSignature(fromUser, user, message));
+    }
 }
