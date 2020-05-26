@@ -4,7 +4,7 @@ import java.math.BigInteger;
 
 public class RSAGenerator {
     public static BigInteger generatePrimeNumber() {
-        return RandomPrimeNumberGenerator.generate(new BigInteger("3"), new BigInteger("100000000000000000000000"));
+        return RandomPrimeNumberGenerator.generate(new BigInteger("3"), new BigInteger("100000000000000000000000000000001000000000000000000000000000000010000000000000000000000000000000100000000000000000000000000000001000000000000000000000000000000010000000000000000000000000000000"));
     }
 
     public static BigInteger getModulas(BigInteger p, BigInteger q) {

@@ -31,4 +31,22 @@ public class ChatSystem {
         BigInteger encryptedMessage = RSAEncryptor.encrypt(messageNumber, encryptionKey, modulas);
         user.receiveMessage(encryptedMessage);
     }
+
+    public void sendDirectMessageWithSignature(User fromUser, User toUser, String message) {
+        sendMessageWithSignature(fromUser, toUser, message);
+    }
+
+    private void sendMessageWithSignature(User fromUser, User toUser, String message) {
+        System.out.println("\nUser " + fromUser.getName() + " sends message \"" + message + "\" WITH SIGNATURE to user " + toUser.getName());
+        BigInteger encryptionKey = toUser.getEncryptionKey();
+        BigInteger modulas = toUser.getModulas();
+        BigInteger messageNumber = Interpreter.interpretToNumber(message);
+        BigInteger encryptedMessage = RSAEncryptor.encrypt(messageNumber, encryptionKey, modulas);
+        BigInteger signature = fromUser.getSignature(messageNumber);
+        toUser.receiveMessageWithSignature(encryptedMessage, signature);
+    }
+
+    public List<User> getUsers() {
+        return users;
+    }
 }

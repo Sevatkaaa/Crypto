@@ -7,6 +7,7 @@ public class Chat {
         User user2 = new User("Leo", chatSystem);
         User user3 = new User("Alina", chatSystem);
         chatSystem.sendDirectMessage(user1, user2, "Hello");
+        chatSystem.sendDirectMessageWithSignature(user1, user2, "Hello");
         chatSystem.sendMessageToEveryone(user3, "Hi Sov");
     }
 }
