@@ -11,7 +11,7 @@ public class Main {
        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
        String message = reader.readLine();
 
-       BigInteger m = Interpreter.interpretToNumber(message);
+       BigInteger m = Converter.convertToNumber(message);
 
        System.out.println(m);
 
@@ -20,9 +20,9 @@ public class Main {
        BigInteger modulas = BigInteger.ONE;
        int counter = 0;
        while (m.compareTo(modulas) == 1 && counter < 100) {
-          p = RSAGenerator.generatePrimeNumber();
-          q = RSAGenerator.generatePrimeNumber();
-          modulas = RSAGenerator.getModulas(p, q);
+          p = RSAProvider.generatePrimeNumber();
+          q = RSAProvider.generatePrimeNumber();
+          modulas = RSAProvider.getModulas(p, q);
           counter++;
        }
 
@@ -31,23 +31,23 @@ public class Main {
           return;
        }
 
-       BigInteger fi = RSAGenerator.getFi(p, q);
+       BigInteger fi = RSAProvider.getFi(p, q);
 
-       BigInteger encryptionKey = RSAGenerator.generateEncryptionKey(fi);
+       BigInteger encryptionKey = RSAProvider.generateEncryptionKey(fi);
 
-       BigInteger decryptionKey = RSAGenerator.getDecryptionKey(encryptionKey, fi);
+       BigInteger decryptionKey = RSAProvider.getDecryptionKey(encryptionKey, fi);
 
-       BigInteger encryptedMessage = RSAEncryptor.encrypt(m, encryptionKey, modulas);
+       BigInteger encryptedMessage = RSAProvider.decrypt(m, encryptionKey, modulas);
 
-       BigInteger decryptedMessage = RSADecryptor.decrypt(encryptedMessage, decryptionKey, modulas);
+       BigInteger decryptedMessage = RSAProvider.decrypt(encryptedMessage, decryptionKey, modulas);
 
-       String messageReturned = Interpreter.interpretToWord(decryptedMessage);
+       String messageReturned = Converter.convertToWord(decryptedMessage);
 
        System.out.println(encryptedMessage);
        System.out.println(decryptedMessage);
        System.out.println(messageReturned);
 
-       BigInteger signature = RSAEncryptor.encrypt(m, decryptionKey, modulas);
+       BigInteger signature = RSAProvider.decrypt(m, decryptionKey, modulas);
        System.out.println("Message with signature: (" + message + ", " + signature + ")");
     }
 }

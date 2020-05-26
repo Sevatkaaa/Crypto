@@ -1,7 +1,7 @@
 package chat;
 
-import rsa.Interpreter;
-import rsa.RSAEncryptor;
+import rsa.Converter;
+import rsa.RSAProvider;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -32,8 +32,8 @@ public class ChatSystem {
         System.out.println("User " + fromUser.getName() + " sends message \"" + message + "\" to user " + user.getName());
         BigInteger encryptionKey = user.getEncryptionKey();
         BigInteger modulas = user.getModulas();
-        BigInteger messageNumber = Interpreter.interpretToNumber(message);
-        BigInteger encryptedMessage = RSAEncryptor.encrypt(messageNumber, encryptionKey, modulas);
+        BigInteger messageNumber = Converter.convertToNumber(message);
+        BigInteger encryptedMessage = RSAProvider.decrypt(messageNumber, encryptionKey, modulas);
         user.receiveMessage(encryptedMessage);
     }
 
@@ -45,8 +45,8 @@ public class ChatSystem {
         System.out.println("\nUser " + fromUser.getName() + " sends message \"" + message + "\" WITH SIGNATURE to user " + toUser.getName());
         BigInteger encryptionKey = toUser.getEncryptionKey();
         BigInteger modulas = toUser.getModulas();
-        BigInteger messageNumber = Interpreter.interpretToNumber(message);
-        BigInteger encryptedMessage = RSAEncryptor.encrypt(messageNumber, encryptionKey, modulas);
+        BigInteger messageNumber = Converter.convertToNumber(message);
+        BigInteger encryptedMessage = RSAProvider.decrypt(messageNumber, encryptionKey, modulas);
         BigInteger signature = fromUser.getSignature(messageNumber);
         toUser.receiveMessageWithSignature(encryptedMessage, signature);
     }

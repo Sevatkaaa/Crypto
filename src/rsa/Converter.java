@@ -2,17 +2,17 @@ package rsa;
 
 import java.math.BigInteger;
 
-public class Interpreter {
+public class Converter {
 
     private static final int SHIFT = 100;
 
-    public static BigInteger interpretToNumber(String message) {
+    public static BigInteger convertToNumber(String message) {
         final StringBuilder result = new StringBuilder();
         message.chars().forEach(symbol -> result.append(symbol + SHIFT));
         return new BigInteger(result.toString());
     }
 
-    public static String interpretToWord(BigInteger m) {
+    public static String convertToWord(BigInteger m) {
         StringBuilder result = new StringBuilder();
         String numberInString = m.toString();
         while (numberInString.length() > 2) {

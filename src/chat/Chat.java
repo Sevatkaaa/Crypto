@@ -11,14 +11,14 @@ public class Chat {
         User user4 = new User("Baguz", chatSystem);
         chatSystem.sendDirectMessage(user1, user2, "Hello");
         chatSystem.sendDirectMessageWithSignature(user1, user2, "Hello");
-        chatSystem.sendMessageToEveryone(user3, "Hi Sov");
-        chatSystem.sendMessageToEveryoneWithSignature(user3, "Hi Sov");
         chatSystem.sendMessageToEveryone(user3, "Hi Sov it's very interesting for me to communicate with you");
+        chatSystem.sendMessageToEveryoneWithSignature(user3, "Hi Sov");
 
         Group group = new Group();
         group.addUser(user1);
         group.addUser(user2);
-        group.addUser(user3);
+//        group.addUser(user3);
+//        group.addUser(user4);
         BigInteger groupMessage = group.createGroupMessage("Only group members can see this message");
         chatSystem.sendGroupMessageToEveryone(user2, groupMessage);
     }

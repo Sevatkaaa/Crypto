@@ -1,7 +1,7 @@
 package chat;
 
-import rsa.Interpreter;
-import rsa.RSAEncryptor;
+import rsa.Converter;
+import rsa.RSAProvider;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ public class Group {
     }
 
     public BigInteger createGroupMessage(String message) {
-        BigInteger messageNumber = Interpreter.interpretToNumber(message);
+        BigInteger messageNumber = Converter.convertToNumber(message);
         List<BigInteger> modules = users.stream()
                 .map(User::getModulas)
                 .collect(Collectors.toList());
@@ -44,7 +44,7 @@ public class Group {
                 .collect(Collectors.toList());
         List<BigInteger> encryptedMessageNumbers = new ArrayList<>();
         for (int i = 0; i < modules.size(); i++) {
-            encryptedMessageNumbers.add(RSAEncryptor.encrypt(messageNumber, keys.get(i), modules.get(i)));
+            encryptedMessageNumbers.add(RSAProvider.decrypt(messageNumber, keys.get(i), modules.get(i)));
         }
         return getCommonMessage(encryptedMessageNumbers, modules);
     }
