@@ -1,8 +1,8 @@
 import java.math.BigInteger;
 
-public class RSADecriptor {
-    public static BigInteger decript(BigInteger encryptedMessage, BigInteger decriptionKey, BigInteger modulas) {
-        String binaryD = decriptionKey.toString(2);
+public class RSADecryptor {
+    public static BigInteger decrypt(BigInteger encryptedMessage, BigInteger decryptionKey, BigInteger modulas) {
+        String binaryD = decryptionKey.toString(2);
         BigInteger message = BigInteger.ONE;
         BigInteger temp;
         for (int i = binaryD.length() - 1; i >= 0; i--) {

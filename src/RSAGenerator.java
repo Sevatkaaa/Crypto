@@ -13,7 +13,7 @@ public class RSAGenerator {
         return p.subtract(BigInteger.ONE).multiply(q.subtract(BigInteger.ONE));
     }
 
-    public static BigInteger generateEncriptionKey(BigInteger n) {
+    public static BigInteger generateEncryptionKey(BigInteger n) {
         if (n.compareTo(new BigInteger("5000")) == -1) {
             BigInteger encriptionKey = BigInteger.ONE;
             while (n.mod(encriptionKey) == BigInteger.ZERO) {
@@ -30,7 +30,7 @@ public class RSAGenerator {
         }
     }
 
-    public static BigInteger getDecriptionKey(BigInteger e, BigInteger fi) {
+    public static BigInteger getDecryptionKey(BigInteger e, BigInteger fi) {
         return e.modInverse(fi);
     }
 }

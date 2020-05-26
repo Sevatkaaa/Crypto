@@ -31,21 +31,21 @@ public class Main {
 
        BigInteger fi = RSAGenerator.getFi(p, q);
 
-       BigInteger encriptionKey = RSAGenerator.generateEncriptionKey(fi);
+       BigInteger encryptionKey = RSAGenerator.generateEncryptionKey(fi);
 
-       BigInteger decriptionKey = RSAGenerator.getDecriptionKey(encriptionKey, fi);
+       BigInteger decryptionKey = RSAGenerator.getDecryptionKey(encryptionKey, fi);
 
-       BigInteger encriptedMessage = RSAEncriptor.encript(m, encriptionKey, modulas);
+       BigInteger encryptedMessage = RSAEncryptor.encrypt(m, encryptionKey, modulas);
 
-       BigInteger decriptedMessage = RSADecriptor.decript(encriptedMessage, decriptionKey, modulas);
+       BigInteger decryptedMessage = RSADecryptor.decrypt(encryptedMessage, decryptionKey, modulas);
 
-       String messageReturned = Interpreter.interpretToWord(decriptedMessage);
+       String messageReturned = Interpreter.interpretToWord(decryptedMessage);
 
-       System.out.println(encriptedMessage);
-       System.out.println(decriptedMessage);
+       System.out.println(encryptedMessage);
+       System.out.println(decryptedMessage);
        System.out.println(messageReturned);
 
-       BigInteger signature = RSAEncriptor.encript(m, decriptionKey, modulas);
+       BigInteger signature = RSAEncryptor.encrypt(m, decryptionKey, modulas);
        System.out.println("Message with signature: (" + message + ", " + signature + ")");
     }
 }
