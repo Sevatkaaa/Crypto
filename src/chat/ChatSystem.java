@@ -23,6 +23,11 @@ public class ChatSystem {
         users.forEach(user -> sendMessage(fromUser, message, user));
     }
 
+    public void sendGroupMessageToEveryone(User fromUser, BigInteger message) {
+        System.out.println("\nUser " + fromUser.getName() + " sends GROUP message \"" + message + "\" to everyone\n");
+        users.forEach(user -> user.receiveMessage(message));
+    }
+
     private void sendMessage(User fromUser, String message, User user) {
         System.out.println("User " + fromUser.getName() + " sends message \"" + message + "\" to user " + user.getName());
         BigInteger encryptionKey = user.getEncryptionKey();

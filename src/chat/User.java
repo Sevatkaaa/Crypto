@@ -6,6 +6,7 @@ import rsa.RSAEncryptor;
 import rsa.RSAGenerator;
 
 import java.math.BigInteger;
+import java.util.Objects;
 
 public class User {
     private String name;
@@ -21,17 +22,9 @@ public class User {
         this.name = name;
         this.chatSystem = chatSystem;
         chatSystem.addUser(this);
-        int counter = 0;
-//        while (m.compareTo(modulas) == 1 && counter < 100) { removed this parasha ???
-            p = RSAGenerator.generatePrimeNumber();
-            q = RSAGenerator.generatePrimeNumber();
-            modulas = RSAGenerator.getModulas(p, q);
-            counter++;
-//        }
-        if (counter == 100) {
-            System.out.println("Message is too big for current range of random numbers. Extend range of possible random generating values");
-            return;
-        }
+        p = RSAGenerator.generatePrimeNumber();
+        q = RSAGenerator.generatePrimeNumber();
+        modulas = RSAGenerator.getModulas(p, q);
         fi = RSAGenerator.getFi(p, q);
         encryptionKey = RSAGenerator.generateEncryptionKey(fi);
         decryptionKey = RSAGenerator.getDecryptionKey(encryptionKey, fi);
@@ -72,5 +65,18 @@ public class User {
             return encryptedSignature.equals(decryptedMessageNumber);
         }).findAny().orElseThrow(IllegalArgumentException::new);
         System.out.println("Message was sent from user: " + userFrom.getName());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return name.equals(user.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
     }
 }

@@ -15,7 +15,7 @@ public class Interpreter {
     public static String interpretToWord(BigInteger m) {
         StringBuilder result = new StringBuilder();
         String numberInString = m.toString();
-        while (!numberInString.isEmpty()) {
+        while (numberInString.length() > 2) {
             String asciiCodeStr = numberInString.substring(0, 3);
             int asciiCode = Integer.parseInt(asciiCodeStr);
             result.append((char) (asciiCode - SHIFT));
