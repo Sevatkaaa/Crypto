@@ -1,17 +1,15 @@
 import java.io.IOException;
-import java.util.Random;
-import java.security.SecureRandom;
 import java.math.BigInteger;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
 public class Main {
-    public static <bool> void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException {
        System.out.println("Enter a message:");
        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
        String message = reader.readLine();
 
-       BigInteger m = WordToNumberInterpretator.interpretateToNumber(message);
+       BigInteger m = Interpreter.interpretToNumber(message);
 
        System.out.println(m);
 
@@ -41,7 +39,7 @@ public class Main {
 
        BigInteger decriptedMessage = RSADecriptor.decript(encriptedMessage, decriptionKey, modulas);
 
-       String messageReturned = WordToNumberInterpretator.interpretateToWord(decriptedMessage);
+       String messageReturned = Interpreter.interpretToWord(decriptedMessage);
 
        System.out.println(encriptedMessage);
        System.out.println(decriptedMessage);
