@@ -1,6 +1,7 @@
 package blockchain;
 
 import com.google.gson.Gson;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -13,6 +14,8 @@ import java.util.stream.Collectors;
 public class BlockChain {
     private static final AtomicInteger BLOCKS = new AtomicInteger();
     private static final int TRANSACTIONS_PER_BLOCK = 20;
+    public static final String BLOCKS_DIR = "/Users/admin/Desktop/univ/BlockChain/src/main/resources/blockchain/";
+    public static final String JSON_PREFIX = ".json";
 
     public static void main(String[] args) throws IOException {
         List<UserAccount> users = initUsers();
@@ -59,7 +62,24 @@ public class BlockChain {
                 System.out.println("Balance for user " + user + " is " + balance);
             });
         } else if (action.equals("2")) {
-
+            List<Block> blocks = getBlocks(BLOCKS.get());
+            blocks.stream().skip(1).forEach(block -> {
+                String prevBlockHash = block.getPrevBlockHash();
+                System.out.println("Prev block hash should be " + prevBlockHash);
+                try {
+                    BufferedReader reader = new BufferedReader(new FileReader(BLOCKS_DIR + (block.getId() - 1) + JSON_PREFIX));
+                    String blockInString = reader.readLine();
+                    String hash = DigestUtils.sha256Hex(blockInString);
+                    System.out.println("Real hash is " + hash);
+                    if (hash.equals(prevBlockHash)) {
+                        System.out.println("Block " + block.getId() + " is VALID");
+                    } else {
+                        System.out.println("Block " + block.getId() + " is NOT VALID");
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
         } else if (action.equals("3")) {
             System.out.println("Users: " + users.stream().skip(1).map(UserAccount::getName).collect(Collectors.joining(", ")));
             System.out.println("Enter user name: ");
@@ -99,15 +119,31 @@ public class BlockChain {
         return true;
     }
 
+    private static List<Block> getBlocks(int lastBlock) {
+        List<Block> blocks = new ArrayList<>();
+        for (int i = 0; i < lastBlock; i++) {
+            JSONParser jsonParser = new JSONParser();
+
+            try (FileReader reader = new FileReader(BLOCKS_DIR + i + JSON_PREFIX)) {
+                Object obj = jsonParser.parse(reader);
+                JSONObject blockJson = (JSONObject) obj;
+                Block block = new Gson().fromJson(blockJson.toString(), Block.class);
+                blocks.add(block);
+            } catch (IOException | ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        return blocks;
+    }
+
     private static List<Transaction> getBlocksTransactions(int lastBlock) {
         List<Transaction> transactions = new ArrayList<>();
         for (int i = 0; i < lastBlock; i++) {
             JSONParser jsonParser = new JSONParser();
 
-            try (FileReader reader = new FileReader("/Users/admin/Desktop/univ/BlockChain/src/main/resources/blockchain/" + i + ".json")) {
+            try (FileReader reader = new FileReader(BLOCKS_DIR + i + JSON_PREFIX)) {
                 Object obj = jsonParser.parse(reader);
                 JSONObject blockJson = (JSONObject) obj;
-//                System.out.println(block);
                 Block block = new Gson().fromJson(blockJson.toString(), Block.class);
                 transactions.addAll(block.getTransactions());
             } catch (IOException | ParseException e) {
