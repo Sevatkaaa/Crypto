@@ -3,7 +3,7 @@ package rsa;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
-public class RandomPrimeNumberGenerator {
+public class Generator {
     public static BigInteger generate(BigInteger minLimit, BigInteger maxLimit) {
         BigInteger bigInteger = maxLimit.subtract(minLimit);
         SecureRandom randNum = new SecureRandom();

@@ -2,7 +2,6 @@ package blockchain;
 
 import com.google.gson.Gson;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
