@@ -10,18 +10,16 @@ import java.util.List;
 
 public class Block {
     private static final String BLOCKS_PATH = "/Users/admin/Desktop/univ/BlockChain/src/main/resources/blockchain/";
-    private static final String HASH_PREFIX = "0000";
+    private static final String HASH_PREFIX = "000";
     private static final String JSON_SUFFIX = ".json";
 
     private Integer id;
     private List<Transaction> transactions;
-    private Integer prevBlockId;
     private String prevBlockHash;
     private Integer nonce;
 
     public Block(Integer id) {
         this.id = id;
-        this.prevBlockId = id - 1;
     }
 
     public Integer getId() {
@@ -30,10 +28,6 @@ public class Block {
 
     public List<Transaction> getTransactions() {
         return transactions;
-    }
-
-    public Integer getPrevBlockId() {
-        return prevBlockId;
     }
 
     public String getPrevBlockHash() {
@@ -92,7 +86,6 @@ public class Block {
             transactions.add(transaction);
         });
         block.put("transactions", transactions);
-        block.put("prevBlockId", id - 1);
         block.put("prevBlockHash", id == 0 ? "hash" : getHashForPrevBlock());
         return block;
     }

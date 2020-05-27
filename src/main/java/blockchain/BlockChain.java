@@ -14,8 +14,8 @@ import java.util.stream.Collectors;
 public class BlockChain {
     private static final AtomicInteger BLOCKS = new AtomicInteger();
     private static final int TRANSACTIONS_PER_BLOCK = 20;
-    public static final String BLOCKS_DIR = "/Users/admin/Desktop/univ/BlockChain/src/main/resources/blockchain/";
-    public static final String JSON_PREFIX = ".json";
+    private static final String BLOCKS_DIR = "/Users/admin/Desktop/univ/BlockChain/src/main/resources/blockchain/";
+    private static final String JSON_PREFIX = ".json";
 
     public static void main(String[] args) throws IOException {
         List<UserAccount> users = initUsers();
@@ -35,8 +35,8 @@ public class BlockChain {
                 "1 - for block number X display all users and their money\n" +
                 "2 - for every block display if it is valid\n" +
                 "3 - balance for user X\n" +
-                "4 - display all users and blocks that tx value is higher than X\n" +
-                "5 - display all users and blocks that tx value is lower than X\n" +
+                "4 - display all txs that tx value is higher than X\n" +
+                "5 - display all txs that tx value is lower than X\n" +
                 "Your input:");
         BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
         String action = r.readLine();
@@ -44,9 +44,7 @@ public class BlockChain {
             System.out.println("Enter block number(max: " + BLOCKS.get() + "): ");
             int blockNum = Integer.parseInt(r.readLine());
             List<Transaction> transactions = getBlocksTransactions(blockNum);
-            Map<String, Integer> userMoney = new HashMap<>();
             List<String> userNames = users.stream().skip(1).map(UserAccount::getName).collect(Collectors.toList());
-            userNames.forEach(user -> userMoney.put(user, 0));
             userNames.forEach(user -> {
                 int minus = transactions.stream()
                         .filter(tx -> tx.getFrom().equals(user))
@@ -121,15 +119,12 @@ public class BlockChain {
 
     private static List<Block> getBlocks(int lastBlock) {
         List<Block> blocks = new ArrayList<>();
+        Gson gson = new Gson();
+        JSONParser jsonParser = new JSONParser();
         for (int i = 0; i < lastBlock; i++) {
-            JSONParser jsonParser = new JSONParser();
-
             try (FileReader reader = new FileReader(BLOCKS_DIR + i + JSON_PREFIX)) {
-                Object obj = jsonParser.parse(reader);
-                JSONObject blockJson = (JSONObject) obj;
-                Block block = new Gson().fromJson(blockJson.toString(), Block.class);
-                blocks.add(block);
-            } catch (IOException | ParseException e) {
+                blocks.add(gson.fromJson((jsonParser.parse(reader)).toString(), Block.class));
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -214,20 +209,13 @@ public class BlockChain {
 
     private static List<UserAccount> initUsers() {
         List<UserAccount> users = new ArrayList<>();
-        UserAccount user0 = new UserAccount("System", Integer.MAX_VALUE);
-        UserAccount user1 = new UserAccount("Sov");
-        UserAccount user2 = new UserAccount("Leo");
-        UserAccount user3 = new UserAccount("Alina");
-        UserAccount user4 = new UserAccount("Borys");
-        UserAccount user5 = new UserAccount("Vol");
-        UserAccount user6 = new UserAccount("Zuck");
-        users.add(user0);
-        users.add(user1);
-        users.add(user2);
-        users.add(user3);
-        users.add(user4);
-        users.add(user5);
-        users.add(user6);
+        users.add(new UserAccount("System", Integer.MAX_VALUE));
+        users.add(new UserAccount("Sov"));
+        users.add(new UserAccount("Leo"));
+        users.add(new UserAccount("Alina"));
+        users.add(new UserAccount("Borys"));
+        users.add(new UserAccount("Vol"));
+        users.add(new UserAccount("Zuck"));
         return users;
     }
 }
