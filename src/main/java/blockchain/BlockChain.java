@@ -79,9 +79,19 @@ public class BlockChain {
             System.out.println("Current balance for user " + userName + " is " + balance);
             System.out.println("Real balance for user " + userName + " is " + users.stream().filter(u -> u.getName().equals(userName)).findAny().get().getMoney());
         } else if (action.equals("4")) {
-
+            System.out.println("Enter value: ");
+            int value = Integer.parseInt(r.readLine());
+            getBlocksTransactions(BLOCKS.get())
+                    .stream()
+                    .filter(tx -> tx.getMoney() > value)
+                    .forEach(System.out::println);
         } else if (action.equals("5")) {
-
+            System.out.println("Enter value: ");
+            int value = Integer.parseInt(r.readLine());
+            getBlocksTransactions(BLOCKS.get())
+                    .stream()
+                    .filter(tx -> tx.getMoney() < value)
+                    .forEach(System.out::println);
         } else {
             System.out.println("bye");
             return false;
