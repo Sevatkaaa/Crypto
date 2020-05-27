@@ -5,11 +5,11 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 
 public class Block {
+    private static final String BLOCKS_PATH = "/Users/admin/Desktop/univ/BlockChain/src/main/resources/blockchain/";
     private static final String HASH_PREFIX = "000";
     private static final String JSON_SUFFIX = ".json";
 
@@ -19,9 +19,9 @@ public class Block {
     private String prevBlockHash;
     private Integer nonce;
 
-    public Block(Integer id, Integer prevBlockId) {
+    public Block(Integer id) {
         this.id = id;
-        this.prevBlockId = prevBlockId;
+        this.prevBlockId = id - 1;
     }
 
     public Integer getId() {
@@ -72,7 +72,7 @@ public class Block {
     }
 
     private void saveToFile(String blockString) {
-        try (FileWriter file = new FileWriter(BlockChain.BLOCKS_PATH + id + JSON_SUFFIX)) {
+        try (FileWriter file = new FileWriter(BLOCKS_PATH + id + JSON_SUFFIX)) {
             file.write(blockString);
             file.flush();
         } catch (IOException e) {
@@ -93,11 +93,17 @@ public class Block {
         });
         block.put("transactions", transactions);
         block.put("prevBlockId", id - 1);
-        block.put("prevBlockHash", "hash"); // refactor later to getHashFromBlockMethod
+        block.put("prevBlockHash", id == 0 ? "hash" : getHashForPrevBlock());
         return block;
     }
 
-    private String convertToString() {
-        return null;
+    private String getHashForPrevBlock() {
+        try (BufferedReader reader = new BufferedReader(new FileReader(BLOCKS_PATH + (id - 1) + JSON_SUFFIX))) {
+            String prevFile = reader.readLine();
+            return DigestUtils.sha256Hex(prevFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 }

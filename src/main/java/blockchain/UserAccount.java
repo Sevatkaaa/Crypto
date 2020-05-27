@@ -5,8 +5,12 @@ public class UserAccount {
     private int money;
 
     public UserAccount(String name) {
+        this(name, 0);
+    }
+
+    public UserAccount(String name, int money) {
         this.name = name;
-        this.money = 0;
+        this.money = money;
     }
 
     public String getName() {
@@ -15,5 +19,10 @@ public class UserAccount {
 
     public int getMoney() {
         return money;
+    }
+
+    public void transfer(UserAccount to, int money) {
+        this.money -= money;
+        to.money += money;
     }
 }

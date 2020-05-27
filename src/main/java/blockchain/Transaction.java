@@ -22,4 +22,11 @@ public class Transaction {
     public int getMoney() {
         return money;
     }
+
+    @Override
+    public String toString() {
+        return "from='" + from + '\'' +
+                ", to='" + to + '\'' +
+                ", money=" + money;
+    }
 }
