@@ -1,21 +1,110 @@
 package blockchain;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import com.google.gson.Gson;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import java.io.*;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class BlockChain {
     private static final AtomicInteger BLOCKS = new AtomicInteger();
     private static final int TRANSACTIONS_PER_BLOCK = 20;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         List<UserAccount> users = initUsers();
         createInitBlock();
         populateUsersWithMoney(users);
         for (int i = 0; i < 20; i++) {
             generateBlock(users);
         }
+        boolean isWorking = true;
+        while (isWorking) {
+            isWorking = doAction(users);
+        }
+    }
+
+    private static boolean doAction(List<UserAccount> users) throws IOException {
+        System.out.println("\nChoose action:\n" +
+                "1 - for block number X display all users and their money\n" +
+                "2 - for every block display if it is valid\n" +
+                "3 - balance for user X\n" +
+                "4 - display all users and blocks that tx value is higher than X\n" +
+                "5 - display all users and blocks that tx value is lower than X\n" +
+                "Your input:");
+        BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
+        String action = r.readLine();
+        if (action.equals("1")) {
+            System.out.println("Enter block number(max: " + BLOCKS.get() + "): ");
+            int blockNum = Integer.parseInt(r.readLine());
+            List<Transaction> transactions = getBlocksTransactions(blockNum);
+            Map<String, Integer> userMoney = new HashMap<>();
+            List<String> userNames = users.stream().skip(1).map(UserAccount::getName).collect(Collectors.toList());
+            userNames.forEach(user -> userMoney.put(user, 0));
+            userNames.forEach(user -> {
+                int minus = transactions.stream()
+                        .filter(tx -> tx.getFrom().equals(user))
+                        .map(Transaction::getMoney)
+                        .mapToInt(Integer::intValue)
+                        .sum();
+                int plus = transactions.stream()
+                        .filter(tx -> tx.getTo().equals(user))
+                        .map(Transaction::getMoney)
+                        .mapToInt(Integer::intValue)
+                        .sum();
+                int balance = plus - minus;
+                System.out.println("Balance for user " + user + " is " + balance);
+            });
+        } else if (action.equals("2")) {
+
+        } else if (action.equals("3")) {
+            System.out.println("Users: " + users.stream().skip(1).map(UserAccount::getName).collect(Collectors.joining(", ")));
+            System.out.println("Enter user name: ");
+            String userName = r.readLine();
+            List<Transaction> transactions = getBlocksTransactions(BLOCKS.get());
+            int minus = transactions.stream()
+                    .filter(tx -> tx.getFrom().equals(userName))
+                    .map(Transaction::getMoney)
+                    .mapToInt(Integer::intValue)
+                    .sum();
+            int plus = transactions.stream()
+                    .filter(tx -> tx.getTo().equals(userName))
+                    .map(Transaction::getMoney)
+                    .mapToInt(Integer::intValue)
+                    .sum();
+            int balance = plus - minus;
+            System.out.println("Current balance for user " + userName + " is " + balance);
+            System.out.println("Real balance for user " + userName + " is " + users.stream().filter(u -> u.getName().equals(userName)).findAny().get().getMoney());
+        } else if (action.equals("4")) {
+
+        } else if (action.equals("5")) {
+
+        } else {
+            System.out.println("bye");
+            return false;
+        }
+        return true;
+    }
+
+    private static List<Transaction> getBlocksTransactions(int lastBlock) {
+        List<Transaction> transactions = new ArrayList<>();
+        for (int i = 0; i < lastBlock; i++) {
+            JSONParser jsonParser = new JSONParser();
+
+            try (FileReader reader = new FileReader("/Users/admin/Desktop/univ/BlockChain/src/main/resources/blockchain/" + i + ".json")) {
+                Object obj = jsonParser.parse(reader);
+                JSONObject blockJson = (JSONObject) obj;
+//                System.out.println(block);
+                Block block = new Gson().fromJson(blockJson.toString(), Block.class);
+                transactions.addAll(block.getTransactions());
+            } catch (IOException | ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        return transactions;
     }
 
     private static Block createInitBlock() {
