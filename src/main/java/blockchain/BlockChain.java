@@ -79,7 +79,7 @@ public class BlockChain {
 
     private static List<UserAccount> initUsers() {
         List<UserAccount> users = new ArrayList<>();
-        UserAccount user0 = new UserAccount("SystemInit", Integer.MAX_VALUE);
+        UserAccount user0 = new UserAccount("System", Integer.MAX_VALUE);
         UserAccount user1 = new UserAccount("Sov");
         UserAccount user2 = new UserAccount("Leo");
         UserAccount user3 = new UserAccount("Alina");

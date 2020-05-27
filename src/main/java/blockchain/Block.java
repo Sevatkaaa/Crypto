@@ -10,7 +10,7 @@ import java.util.List;
 
 public class Block {
     private static final String BLOCKS_PATH = "/Users/admin/Desktop/univ/BlockChain/src/main/resources/blockchain/";
-    private static final String HASH_PREFIX = "000";
+    private static final String HASH_PREFIX = "0000";
     private static final String JSON_SUFFIX = ".json";
 
     private Integer id;
