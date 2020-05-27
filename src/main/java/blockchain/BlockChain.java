@@ -16,6 +16,8 @@ public class BlockChain {
     private static final int TRANSACTIONS_PER_BLOCK = 20;
     private static final String BLOCKS_DIR = "/Users/admin/Desktop/univ/BlockChain/src/main/resources/blockchain/";
     private static final String JSON_PREFIX = ".json";
+    private static final Gson GSON = new Gson();
+    private static final JSONParser JSON_PARSER = new JSONParser();
 
     public static void main(String[] args) throws IOException {
         List<UserAccount> users = initUsers();
@@ -46,16 +48,8 @@ public class BlockChain {
             List<Transaction> transactions = getBlocksTransactions(blockNum);
             List<String> userNames = users.stream().skip(1).map(UserAccount::getName).collect(Collectors.toList());
             userNames.forEach(user -> {
-                int minus = transactions.stream()
-                        .filter(tx -> tx.getFrom().equals(user))
-                        .map(Transaction::getMoney)
-                        .mapToInt(Integer::intValue)
-                        .sum();
-                int plus = transactions.stream()
-                        .filter(tx -> tx.getTo().equals(user))
-                        .map(Transaction::getMoney)
-                        .mapToInt(Integer::intValue)
-                        .sum();
+                int minus = getTxsFrom(transactions, user);
+                int plus = getTxsTo(transactions, user);
                 int balance = plus - minus;
                 System.out.println("Balance for user " + user + " is " + balance);
             });
@@ -83,16 +77,8 @@ public class BlockChain {
             System.out.println("Enter user name: ");
             String userName = r.readLine();
             List<Transaction> transactions = getBlocksTransactions(BLOCKS.get());
-            int minus = transactions.stream()
-                    .filter(tx -> tx.getFrom().equals(userName))
-                    .map(Transaction::getMoney)
-                    .mapToInt(Integer::intValue)
-                    .sum();
-            int plus = transactions.stream()
-                    .filter(tx -> tx.getTo().equals(userName))
-                    .map(Transaction::getMoney)
-                    .mapToInt(Integer::intValue)
-                    .sum();
+            int minus = getTxsFrom(transactions, userName);
+            int plus = getTxsTo(transactions, userName);
             int balance = plus - minus;
             System.out.println("Current balance for user " + userName + " is " + balance);
             System.out.println("Real balance for user " + userName + " is " + users.stream().filter(u -> u.getName().equals(userName)).findAny().get().getMoney());
@@ -117,13 +103,27 @@ public class BlockChain {
         return true;
     }
 
+    private static int getTxsTo(List<Transaction> transactions, String userName) {
+        return transactions.stream()
+                .filter(tx -> tx.getTo().equals(userName))
+                .map(Transaction::getMoney)
+                .mapToInt(Integer::intValue)
+                .sum();
+    }
+
+    private static int getTxsFrom(List<Transaction> transactions, String user) {
+        return transactions.stream()
+                .filter(tx -> tx.getFrom().equals(user))
+                .map(Transaction::getMoney)
+                .mapToInt(Integer::intValue)
+                .sum();
+    }
+
     private static List<Block> getBlocks(int lastBlock) {
         List<Block> blocks = new ArrayList<>();
-        Gson gson = new Gson();
-        JSONParser jsonParser = new JSONParser();
         for (int i = 0; i < lastBlock; i++) {
             try (FileReader reader = new FileReader(BLOCKS_DIR + i + JSON_PREFIX)) {
-                blocks.add(gson.fromJson((jsonParser.parse(reader)).toString(), Block.class));
+                blocks.add(getParsedBlock(reader));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -134,18 +134,17 @@ public class BlockChain {
     private static List<Transaction> getBlocksTransactions(int lastBlock) {
         List<Transaction> transactions = new ArrayList<>();
         for (int i = 0; i < lastBlock; i++) {
-            JSONParser jsonParser = new JSONParser();
-
             try (FileReader reader = new FileReader(BLOCKS_DIR + i + JSON_PREFIX)) {
-                Object obj = jsonParser.parse(reader);
-                JSONObject blockJson = (JSONObject) obj;
-                Block block = new Gson().fromJson(blockJson.toString(), Block.class);
-                transactions.addAll(block.getTransactions());
+                transactions.addAll(getParsedBlock(reader).getTransactions());
             } catch (IOException | ParseException e) {
                 e.printStackTrace();
             }
         }
         return transactions;
+    }
+
+    private static Block getParsedBlock(FileReader reader) throws IOException, ParseException {
+        return GSON.fromJson((JSON_PARSER.parse(reader)).toString(), Block.class);
     }
 
     private static Block createInitBlock() {
@@ -160,12 +159,14 @@ public class BlockChain {
 
     private static void populateUsersWithMoney(List<UserAccount> users) {
         Block block = new Block(BLOCKS.get());
-        List<Transaction> transactions = new ArrayList<>();
-        for (int i = 1; i < users.size(); i++) {
-            Transaction tx = createInitTransaction(users.get(0), users.get(i));
-            System.out.println("Just created initial tx: " + tx);
-            transactions.add(tx);
-        }
+        List<Transaction> transactions = users.stream()
+                .skip(1)
+                .map(user -> {
+                    Transaction tx = createInitTransaction(users.get(0), user);
+                    System.out.println("Just created initial tx: " + tx);
+                    return tx;
+                })
+                .collect(Collectors.toList());
         block.setTransactions(transactions);
         String hash = block.computeHashAndSaveToFile();
         System.out.println("Initial block with money created with hash " + hash);
@@ -194,7 +195,10 @@ public class BlockChain {
 
     private static Transaction createRandomTransaction(List<UserAccount> users) {
         int numOfUsers = users.size();
-        Integer minUserMoney = users.stream().map(UserAccount::getMoney).min(Integer::compareTo).orElse(0);
+        Integer minUserMoney = users.stream()
+                .map(UserAccount::getMoney)
+                .min(Integer::compareTo)
+                .orElse(0);
         int from = (int) (Math.random() * numOfUsers);
         int to = (int) (Math.random() * numOfUsers);
         while (to == from) {
