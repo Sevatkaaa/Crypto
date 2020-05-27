@@ -19,13 +19,13 @@ public class BlockChainSystem {
         Block initBlock = new Block(0, null);
         initBlock.setTransactions(Collections.emptyList());
         initBlock.setPrevBlockHash(null);
-        initBlock.setNonce(0);
-        String hash = initBlock.computeHash();
+        String hash = initBlock.computeHashAndSaveToFile();
+        System.out.println("Initial block created with hash " + hash);
         return initBlock;
     }
 
     private static void generateBlock(BlockChain blockChain, List<UserAccount> users) {
-
+        System.exit(0);
     }
 
     private static List<UserAccount> initUsers() {
