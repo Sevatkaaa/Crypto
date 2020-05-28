@@ -43,7 +43,7 @@ public class Group {
                 .map(User::getEncryptionKey)
                 .collect(Collectors.toList());
         List<BigInteger> encryptedMessageNumbers = new ArrayList<>();
-        for (int i = 0; i < ns.size(); i++) {
+        for (int i = 0; i < users.size(); i++) {
             encryptedMessageNumbers.add(RSAProvider.decrypt(messageNumber, keys.get(i), ns.get(i)));
         }
         return getCommonMessage(encryptedMessageNumbers, ns);
