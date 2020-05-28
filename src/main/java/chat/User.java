@@ -28,6 +28,15 @@ public class User {
         decryptionKey = RSAProvider.getDecryptionKey(encryptionKey, fi);
     }
 
+    public void recreateKeys() {
+        p = RSAProvider.generatePrimeNumber();
+        q = RSAProvider.generatePrimeNumber();
+        n = RSAProvider.getN(p, q);
+        fi = RSAProvider.getFi(p, q);
+        encryptionKey = RSAProvider.generateEncryptionKey(fi);
+        decryptionKey = RSAProvider.getDecryptionKey(encryptionKey, fi);
+    }
+
     public void receiveMessage(BigInteger message) {
         System.out.println("\nUser " + name + " just received message: " + message);
         BigInteger decryptedMessageNumber = RSAProvider.decrypt(message, decryptionKey, n);
