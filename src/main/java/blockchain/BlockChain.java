@@ -11,20 +11,19 @@ import java.util.stream.Collectors;
 
 public class BlockChain {
     private static int NOW_BLOCKS = 0;
-    private static final int TRANSACTIONS_PER_BLOCK = 20;
     private static final String BLOCKS_DIR = "/Users/admin/Desktop/univ/COVID-19/crypto/BlockChain/src/main/resources/blockchain/";
     private static final String JSON_PREFIX = ".json";
     private static final int BLOCKS_TOTAL = 20;
 
     public static void main(String[] args) throws IOException {
-        List<UserAccount> users = new ArrayList<>();
-        users.add(new UserAccount("System", Integer.MAX_VALUE));
-        users.add(new UserAccount("Sov"));
-        users.add(new UserAccount("Leo"));
-        users.add(new UserAccount("Alina"));
-        users.add(new UserAccount("Borys"));
-        users.add(new UserAccount("Vol"));
-        users.add(new UserAccount("Zuck"));
+        List<Wallet> users = new ArrayList<>();
+        users.add(new Wallet("System", Integer.MAX_VALUE));
+        users.add(new Wallet("Sov"));
+        users.add(new Wallet("Leo"));
+        users.add(new Wallet("Alina"));
+        users.add(new Wallet("Borys"));
+        users.add(new Wallet("Vol"));
+        users.add(new Wallet("Zuck"));
         initializeBlockChain(users);
         for (int i = 0; i < BLOCKS_TOTAL; i++) {
             generateBlock(users);
@@ -35,7 +34,7 @@ public class BlockChain {
         }
     }
 
-    private static boolean doAction(List<UserAccount> users) throws IOException {
+    private static boolean doAction(List<Wallet> users) throws IOException {
         System.out.println("\nPrint action number:\n" +
                 "1 - display all users and their money before block\n" +
                 "2 - check blocks for corruption\n" +
@@ -48,7 +47,7 @@ public class BlockChain {
             System.out.println("Block num: ");
             int blockNum = Integer.parseInt(r.readLine());
             List<Transaction> transactions = getBlocksTransactions(blockNum);
-            List<String> userNames = users.stream().skip(1).map(UserAccount::getName).collect(Collectors.toList());
+            List<String> userNames = users.stream().skip(1).map(Wallet::getName).collect(Collectors.toList());
             userNames.forEach(user -> {
                 int minus = getTxsFrom(transactions, user);
                 int plus = getTxsTo(transactions, user);
@@ -73,7 +72,7 @@ public class BlockChain {
             });
             System.out.println("All blocks have correct data, all hashes are equal to expected values");
         } else if (action.equals("3")) {
-            System.out.println("User list: " + users.stream().skip(1).map(UserAccount::getName).collect(Collectors.joining(", ")));
+            System.out.println("User list: " + users.stream().skip(1).map(Wallet::getName).collect(Collectors.joining(", ")));
             System.out.println("User: ");
             String userName = r.readLine();
             List<Transaction> transactions = getBlocksTransactions(NOW_BLOCKS);
@@ -141,18 +140,18 @@ public class BlockChain {
         return GSON.fromJson((JSON_PARSER.parse(reader)).toString(), Block.class);
     }
 
-    private static Block initializeBlockChain(List<UserAccount> users) {
+    private static Block initializeBlockChain(List<Wallet> users) {
         Block initBlock = new Block(0);
         initBlock.setTransactions(Collections.emptyList());
         initBlock.setPrevBlockHash(null);
-        String hash = initBlock.computeHashAndSaveToFile();
+        String hash = initBlock.getHash();
         System.out.println("Initial block created with hash " + hash);
         NOW_BLOCKS++;
         sendInitialMoney(users);
         return initBlock;
     }
 
-    private static void sendInitialMoney(List<UserAccount> users) {
+    private static void sendInitialMoney(List<Wallet> users) {
         Block block = new Block(NOW_BLOCKS);
         List<Transaction> transactions = users.stream()
                 .skip(1)
@@ -163,34 +162,35 @@ public class BlockChain {
                 })
                 .collect(Collectors.toList());
         block.setTransactions(transactions);
-        String hash = block.computeHashAndSaveToFile();
+        String hash = block.getHash();
         System.out.println("Initial block with money created with hash " + hash);
         NOW_BLOCKS++;
     }
 
-    private static Transaction createInitTransaction(UserAccount from, UserAccount to) {
+    private static Transaction createInitTransaction(Wallet from, Wallet to) {
         int money = (int) (Math.random() * 1000000);
         from.transfer(to, money);
         return new Transaction(from.getName(), to.getName(), money);
     }
 
-    private static void generateBlock(List<UserAccount> users) {
+    private static void generateBlock(List<Wallet> users) {
         Block block = new Block(NOW_BLOCKS++);
         List<Transaction> transactions = new ArrayList<>();
-        for (int i = 0; i < TRANSACTIONS_PER_BLOCK; i++) {
-            Transaction tx = createRandomTransaction(users);
+        int txNum = (int) (Math.random() * 20) + 5;
+        for (int i = 0; i < txNum; i++) {
+            Transaction tx = randTx(users);
             System.out.println("Just created tx: " + tx);
             transactions.add(tx);
         }
         block.setTransactions(transactions);
-        String hash = block.computeHashAndSaveToFile();
+        String hash = block.getHash();
         System.out.println("Block with id " + block.getId() + " created with hash " + hash);
     }
 
-    private static Transaction createRandomTransaction(List<UserAccount> users) {
+    private static Transaction randTx(List<Wallet> users) {
         int numOfUsers = users.size();
         Integer minUserMoney = users.stream()
-                .map(UserAccount::getMoney)
+                .map(Wallet::getMoney)
                 .min(Integer::compareTo)
                 .orElse(0);
         int from = (int) (Math.random() * numOfUsers);
@@ -199,8 +199,8 @@ public class BlockChain {
             to = (int) (Math.random() * numOfUsers);
         }
         int amount = (int) (Math.random() * minUserMoney) / numOfUsers;
-        UserAccount fromUser = users.get(from);
-        UserAccount toUser = users.get(to);
+        Wallet fromUser = users.get(from);
+        Wallet toUser = users.get(to);
         fromUser.transfer(toUser, amount);
         return new Transaction(fromUser.getName(), toUser.getName(), amount);
     }

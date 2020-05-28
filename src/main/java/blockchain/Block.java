@@ -50,8 +50,19 @@ public class Block {
         this.nonce = nonce;
     }
 
-    public String computeHashAndSaveToFile() {
-        JSONObject block = getBasicBlockJSON();
+    public String getHash() {
+        JSONObject block = new JSONObject();
+        block.put("id", id);
+        JSONArray transactions = new JSONArray();
+        this.transactions.stream().forEach(tx -> {
+            JSONObject transaction = new JSONObject();
+            transaction.put("from", tx.getFrom());
+            transaction.put("to", tx.getTo());
+            transaction.put("money", tx.getMoney());
+            transactions.add(transaction);
+        });
+        block.put("transactions", transactions);
+        block.put("prevBlockHash", id == 0 ? "hash" : getHashForPrevBlock());
         int nonce = 0;
         while (true) {
             block.put("nonce", ++nonce);
@@ -72,22 +83,6 @@ public class Block {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private JSONObject getBasicBlockJSON() {
-        JSONObject block = new JSONObject();
-        block.put("id", id);
-        JSONArray transactions = new JSONArray();
-        this.transactions.stream().forEach(tx -> {
-            JSONObject transaction = new JSONObject();
-            transaction.put("from", tx.getFrom());
-            transaction.put("to", tx.getTo());
-            transaction.put("money", tx.getMoney());
-            transactions.add(transaction);
-        });
-        block.put("transactions", transactions);
-        block.put("prevBlockHash", id == 0 ? "hash" : getHashForPrevBlock());
-        return block;
     }
 
     private String getHashForPrevBlock() {
