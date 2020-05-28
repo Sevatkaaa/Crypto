@@ -11,7 +11,7 @@ public class User {
     private ChatSystem chatSystem;
     private BigInteger p;
     private BigInteger q;
-    private BigInteger modulas;
+    private BigInteger n;
     private BigInteger fi;
     private BigInteger encryptionKey;
     private BigInteger decryptionKey;
@@ -22,7 +22,7 @@ public class User {
         chatSystem.addUser(this);
         p = RSAProvider.generatePrimeNumber();
         q = RSAProvider.generatePrimeNumber();
-        modulas = RSAProvider.getModulas(p, q);
+        n = RSAProvider.getN(p, q);
         fi = RSAProvider.getFi(p, q);
         encryptionKey = RSAProvider.generateEncryptionKey(fi);
         decryptionKey = RSAProvider.getDecryptionKey(encryptionKey, fi);
@@ -30,7 +30,7 @@ public class User {
 
     public void receiveMessage(BigInteger message) {
         System.out.println("\nUser " + name + " just received message: " + message);
-        BigInteger decryptedMessageNumber = RSAProvider.decrypt(message, decryptionKey, modulas);
+        BigInteger decryptedMessageNumber = RSAProvider.decrypt(message, decryptionKey, n);
         System.out.println("Decrypted message number is " + decryptedMessageNumber);
         String decryptedMessage = Converter.convertToWord(decryptedMessageNumber);
         System.out.println("Decrypted message is \"" + decryptedMessage + "\"");
@@ -40,8 +40,8 @@ public class User {
         return name;
     }
 
-    public BigInteger getModulas() {
-        return modulas;
+    public BigInteger getN() {
+        return n;
     }
 
     public BigInteger getEncryptionKey() {
@@ -49,17 +49,17 @@ public class User {
     }
 
     public BigInteger getSignature(BigInteger messageNumber) {
-        return RSAProvider.decrypt(messageNumber, decryptionKey, modulas);
+        return RSAProvider.decrypt(messageNumber, decryptionKey, n);
     }
 
     public void receiveMessageWithSignature(BigInteger encryptedMessage, BigInteger signature) {
         System.out.println("User " + name + " just received message WITH SIGNATURE: " + encryptedMessage);
-        BigInteger decryptedMessageNumber = RSAProvider.decrypt(encryptedMessage, decryptionKey, modulas);
+        BigInteger decryptedMessageNumber = RSAProvider.decrypt(encryptedMessage, decryptionKey, n);
         System.out.println("Decrypted message number is " + decryptedMessageNumber);
         String decryptedMessage = Converter.convertToWord(decryptedMessageNumber);
         System.out.println("Decrypted message is \"" + decryptedMessage + "\"");
         User userFrom = chatSystem.getUsers().stream().filter(user -> {
-            BigInteger encryptedSignature = RSAProvider.decrypt(signature, user.getEncryptionKey(), user.getModulas());
+            BigInteger encryptedSignature = RSAProvider.decrypt(signature, user.getEncryptionKey(), user.getN());
             return encryptedSignature.equals(decryptedMessageNumber);
         }).findAny().orElseThrow(IllegalArgumentException::new);
         System.out.println("Message was sent from user: " + userFrom.getName());

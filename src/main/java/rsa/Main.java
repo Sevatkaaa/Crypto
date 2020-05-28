@@ -17,37 +17,25 @@ public class Main {
 
        BigInteger p = BigInteger.ONE;
        BigInteger q = BigInteger.ONE;
-       BigInteger modulas = BigInteger.ONE;
-       int counter = 0;
-       while (m.compareTo(modulas) == 1 && counter < 100) {
+       BigInteger n = BigInteger.ONE;
+       while (m.compareTo(n) > 0) {
           p = RSAProvider.generatePrimeNumber();
           q = RSAProvider.generatePrimeNumber();
-          modulas = RSAProvider.getModulas(p, q);
-          counter++;
-       }
-
-       if (counter == 100) {
-          System.out.println("Message is too big for current range of random numbers. Extend range of possible random generating values");
-          return;
+          n = RSAProvider.getN(p, q);
        }
 
        BigInteger fi = RSAProvider.getFi(p, q);
 
        BigInteger encryptionKey = RSAProvider.generateEncryptionKey(fi);
-
        BigInteger decryptionKey = RSAProvider.getDecryptionKey(encryptionKey, fi);
-
-       BigInteger encryptedMessage = RSAProvider.decrypt(m, encryptionKey, modulas);
-
-       BigInteger decryptedMessage = RSAProvider.decrypt(encryptedMessage, decryptionKey, modulas);
-
+       BigInteger encryptedMessage = RSAProvider.decrypt(m, encryptionKey, n);
+       BigInteger decryptedMessage = RSAProvider.decrypt(encryptedMessage, decryptionKey, n);
        String messageReturned = Converter.convertToWord(decryptedMessage);
-
        System.out.println(encryptedMessage);
        System.out.println(decryptedMessage);
        System.out.println(messageReturned);
 
-       BigInteger signature = RSAProvider.decrypt(m, decryptionKey, modulas);
+       BigInteger signature = RSAProvider.decrypt(m, decryptionKey, n);
        System.out.println("Message with signature: (" + message + ", " + signature + ")");
     }
 }

@@ -31,9 +31,9 @@ public class ChatSystem {
     private void sendMessage(User fromUser, String message, User user) {
         System.out.println("User " + fromUser.getName() + " sends message \"" + message + "\" to user " + user.getName());
         BigInteger encryptionKey = user.getEncryptionKey();
-        BigInteger modulas = user.getModulas();
+        BigInteger n = user.getN();
         BigInteger messageNumber = Converter.convertToNumber(message);
-        BigInteger encryptedMessage = RSAProvider.decrypt(messageNumber, encryptionKey, modulas);
+        BigInteger encryptedMessage = RSAProvider.decrypt(messageNumber, encryptionKey, n);
         user.receiveMessage(encryptedMessage);
     }
 
@@ -44,9 +44,9 @@ public class ChatSystem {
     private void sendMessageWithSignature(User fromUser, User toUser, String message) {
         System.out.println("\nUser " + fromUser.getName() + " sends message \"" + message + "\" WITH SIGNATURE to user " + toUser.getName());
         BigInteger encryptionKey = toUser.getEncryptionKey();
-        BigInteger modulas = toUser.getModulas();
+        BigInteger n = toUser.getN();
         BigInteger messageNumber = Converter.convertToNumber(message);
-        BigInteger encryptedMessage = RSAProvider.decrypt(messageNumber, encryptionKey, modulas);
+        BigInteger encryptedMessage = RSAProvider.decrypt(messageNumber, encryptionKey, n);
         BigInteger signature = fromUser.getSignature(messageNumber);
         toUser.receiveMessageWithSignature(encryptedMessage, signature);
     }

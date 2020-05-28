@@ -13,10 +13,10 @@ public class Group {
     private List<User> users = new ArrayList<>();
 
     public boolean addUser(User user) {
-        BigInteger currentUserModulas = user.getModulas();
+        BigInteger currentUserN = user.getN();
         AtomicBoolean found = new AtomicBoolean(true);
         users.forEach(anyUser -> {
-            if (isNotCoprime(currentUserModulas, anyUser.getModulas())) {
+            if (isNotCoprime(currentUserN, anyUser.getN())) {
                 found.set(false);
             }
         });
@@ -36,17 +36,17 @@ public class Group {
 
     public BigInteger createGroupMessage(String message) {
         BigInteger messageNumber = Converter.convertToNumber(message);
-        List<BigInteger> modules = users.stream()
-                .map(User::getModulas)
+        List<BigInteger> ns = users.stream()
+                .map(User::getN)
                 .collect(Collectors.toList());
         List<BigInteger> keys = users.stream()
                 .map(User::getEncryptionKey)
                 .collect(Collectors.toList());
         List<BigInteger> encryptedMessageNumbers = new ArrayList<>();
-        for (int i = 0; i < modules.size(); i++) {
-            encryptedMessageNumbers.add(RSAProvider.decrypt(messageNumber, keys.get(i), modules.get(i)));
+        for (int i = 0; i < ns.size(); i++) {
+            encryptedMessageNumbers.add(RSAProvider.decrypt(messageNumber, keys.get(i), ns.get(i)));
         }
-        return getCommonMessage(encryptedMessageNumbers, modules);
+        return getCommonMessage(encryptedMessageNumbers, ns);
     }
 
     private BigInteger getCommonMessage(List<BigInteger> c, List<BigInteger> modules) {
